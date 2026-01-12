@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>403 forbidden (CSS hover)</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div class="scene">
+    <div class="overlay"></div>
+    <div class="overlay"></div>
+    <div class="overlay"></div>
+    <div class="overlay"></div>
+    <span class="bg-403">403</span>
+    <div class="text">
+      <span class="hero-text"></span>
+      <span class="msg">can't let <span>you</span> in.</span>
+      <span class="support">
+        <span>sorry but this was intentional</span>
+      </span>
+    </div>
+    <div class="lock"></div>
+  </div>
+  
+  <div id="popup-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>Hi, I'm Fowtyi!</h2>
+      <p>Sorry, but I'm currently closing my CV and updating it.</p>
+      <p class="sarcasm">
+        Thanks a lot. <br>
+        <em>(Because clearly, building an animated 403 page was the fastest way to get that done.)</em>
+      </p>
+    </div>
+  </div>
+  
+  <script>
+    const scene = document.querySelector('.scene');
+    const modal = document.getElementById('popup-modal');
+    const closeBtn = document.querySelector('.close-btn');
+    
+    // --- 1. AUTO-FIT LOGIC ---
+    function fitScene() {
+      const margin = 20; // safe space around edges
+      const sceneBaseSize = 400; // The CSS width/height of the .scene
+      
+      const availableWidth = window.innerWidth - margin;
+      const availableHeight = window.innerHeight - margin;
+      
+      // Calculate how much we need to shrink (or grow)
+      const scaleW = availableWidth / sceneBaseSize;
+      const scaleH = availableHeight / sceneBaseSize;
+      
+      // Use the smaller scale so it fits both width and height
+      // Limit max scale to 1.2 so it doesn't get too pixelated on huge screens
+      const scale = Math.min(scaleW, scaleH, 1.2);
+      
+      // Set the CSS variable
+      document.documentElement.style.setProperty('--responsive-scale', scale);
+    }
+    
+    // Run on load and whenever window resizes
+    window.addEventListener('resize', fitScene);
+    window.addEventListener('load', fitScene);
+    // ---------------------------
+    
+    // --- 2. CLICK INTERACTION ---
+    scene.addEventListener('click', (e) => {
+      // Get the current visual bounds of the scene
+      const rect = scene.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      // Calculate distance of click from center
+      const distance = Math.sqrt(Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2));
+      
+      // Calculate the click radius based on the current scale
+      // The lock is roughly 120px wide unscaled. 
+      // We take the current scale into account for the hit area.
+      const currentScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--responsive-scale'));
+      const hitRadius = 70 * currentScale;
+      
+      if (distance < hitRadius) {
+        modal.classList.add('show');
+      }
+    });
+    
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('show');
+    });
+    
+    window.addEventListener('click', (e) => {
+      if (e.target == modal) {
+        modal.classList.remove('show');
+      }
+    });
+  </script>
+  
+</body>
+
+</html>
